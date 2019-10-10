@@ -28,21 +28,33 @@ var uiController = (() => {
 })();
 
 var controller = ((budgetCtrl, uiCtrl) => {
-    var domStrings = uiCtrl.getDOMStrings();
+
+    var setupEventListeners = () => {
+        var domStrings = uiCtrl.getDOMStrings();
+
+        document.querySelector(domStrings.inputBtn).addEventListener('click', addItem);
+
+    // action based on enter key press
+    document.addEventListener('keypress', function(event) {
+        if (event.keyCode === 13 || event.which === 13) {
+            console.log("enter pressed!!");
+            addItem();
+        }
+    });
+    }
 
     var addItem = () => {
         var inputs = uiCtrl.getInput();
         console.log(inputs);
     }
 
-    document.querySelector(domStrings.inputBtn).addEventListener('click', addItem);
-
-    // action based on enter key press
-    document.addEventListener('keypress', function(event) {
-        if (event.keyCode === 13 || event.which === 13) {
-            console.log("enter pressed!!")
-            addItem();
+    return {
+        init: () => {
+            console.log("init");
+            setupEventListeners();
         }
-    });
+    }
 
 })(budgetController, uiController);
+
+controller.init();
