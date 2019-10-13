@@ -37,10 +37,6 @@ var budgetController = (() => {
 
             data.allItems[type].push(type);
             return item;
-        },
-
-        showRecord: () => {
-            console.table(data);
         }
     };
 })();
@@ -50,8 +46,9 @@ var uiController = (() => {
         inputType: '.add__type',
         inputDescription: '.add__description',
         inputValue: '.add__value',
-        inputBtn: '.add__btn'
-
+        inputBtn: '.add__btn',
+        incomeList: '.income__list',
+        expenseList: '.expenses__list'
     }
 
 
@@ -62,6 +59,26 @@ var uiController = (() => {
             description: document.querySelector(DOMStrings.inputDescription).value,
             value: document.querySelector(DOMStrings.inputValue).value
             }
+        },
+
+        addList: (type, obj) => {
+            // create html string with placeholder
+            var element, htmlChunk;
+            if(type === 'inc') {
+                element = DOMStrings.incomeList;
+
+                htmlChunk = '<div class="item clearfix" id="%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+
+            } else {
+                element = DOMStrings.expenseList;
+                htmlChunk = '<div class="item clearfix" id="%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            }
+
+            // replace placeholders with with value from obj
+            htmlChunk = htmlChunk.replace('%id%', obj.id).replace('%description%', obj.description).replace('%value%', obj.value);
+
+            document.querySelector(element).insertAdjacentHTML('beforeend', htmlChunk);
+
         },
 
         getDOMStrings: () => {
@@ -91,8 +108,7 @@ var controller = ((budgetCtrl, uiCtrl) => {
 
         inputs = uiCtrl.getInput();
         newItem = budgetController.addItem(inputs.type, inputs.description, inputs.value);
-
-        console.table(newItem);
+        uiCtrl.addList(inputs.type, newItem);
     }
 
     return {
