@@ -1,4 +1,48 @@
 var budgetController = (() => {
+
+    var Income = function(id, description, value) {
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    };
+
+    var Expense = function(id, description, value) {
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    };
+
+    var data = {
+        allItems: {
+            exp: [],
+            inc: []
+        },
+
+        total: {
+            exp: 0,
+            inc: 0
+        }
+    };
+
+    return {
+        addItem: (type, description, value) => {
+            var item, id;
+
+            id = Math.random().toString(36).slice(2);
+            if( type === 'inc') {           
+                item = new Income(id, description, value);
+            } else {
+                item = new Expense(id, description, value);
+            }
+
+            data.allItems[type].push(type);
+            return item;
+        },
+
+        showRecord: () => {
+            console.table(data);
+        }
+    };
 })();
 
 var uiController = (() => {
@@ -37,20 +81,22 @@ var controller = ((budgetCtrl, uiCtrl) => {
     // action based on enter key press
     document.addEventListener('keypress', function(event) {
         if (event.keyCode === 13 || event.which === 13) {
-            console.log("enter pressed!!");
             addItem();
         }
     });
     }
 
     var addItem = () => {
-        var inputs = uiCtrl.getInput();
-        console.log(inputs);
+        var inputs, newItem;
+
+        inputs = uiCtrl.getInput();
+        newItem = budgetController.addItem(inputs.type, inputs.description, inputs.value);
+
+        console.table(newItem);
     }
 
     return {
         init: () => {
-            console.log("init");
             setupEventListeners();
         }
     }
