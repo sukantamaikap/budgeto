@@ -49,7 +49,7 @@ var uiController = (() => {
         inputBtn: '.add__btn',
         incomeList: '.income__list',
         expenseList: '.expenses__list'
-    }
+    };
 
 
     return {
@@ -81,10 +81,20 @@ var uiController = (() => {
 
         },
 
+        clearFields: () => {
+            var fields, fieldsArr;
+            // returns a coma separated elements matching the criterial
+            fields = document.querySelectorAll(DOMStrings.inputDescription + ',' + DOMStrings.inputValue);
+            Array.prototype.slice.call(fields).forEach(function(element) {
+                element.value = '';
+            });
+            fields[0].focus();
+        },
+
         getDOMStrings: () => {
             return DOMStrings;
         }
-    }
+    };
 
 })();
 
@@ -101,7 +111,7 @@ var controller = ((budgetCtrl, uiCtrl) => {
             addItem();
         }
     });
-    }
+    };
 
     var addItem = () => {
         var inputs, newItem;
@@ -109,14 +119,14 @@ var controller = ((budgetCtrl, uiCtrl) => {
         inputs = uiCtrl.getInput();
         newItem = budgetController.addItem(inputs.type, inputs.description, inputs.value);
         uiCtrl.addList(inputs.type, newItem);
-    }
+        uiCtrl.clearFields();
+    };
 
     return {
         init: () => {
             setupEventListeners();
         }
-    }
-
+    };
 })(budgetController, uiController);
 
 controller.init();
