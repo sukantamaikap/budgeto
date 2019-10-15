@@ -57,7 +57,7 @@ var uiController = (() => {
             return {
             type: document.querySelector(DOMStrings.inputType).value,
             description: document.querySelector(DOMStrings.inputDescription).value,
-            value: document.querySelector(DOMStrings.inputValue).value
+            value: parseFloat(document.querySelector(DOMStrings.inputValue).value)
             }
         },
 
@@ -117,9 +117,13 @@ var controller = ((budgetCtrl, uiCtrl) => {
         var inputs, newItem;
 
         inputs = uiCtrl.getInput();
-        newItem = budgetController.addItem(inputs.type, inputs.description, inputs.value);
-        uiCtrl.addList(inputs.type, newItem);
-        uiCtrl.clearFields();
+
+        console.table(inputs);
+        if(inputs.description != '' && !isNaN(inputs.value) && inputs.value > 0) {
+            newItem = budgetController.addItem(inputs.type, inputs.description, inputs.value);
+            uiCtrl.addList(inputs.type, newItem);
+            uiCtrl.clearFields();
+        }
     };
 
     return {
