@@ -21,7 +21,18 @@ var budgetController = (() => {
         total: {
             exp: 0,
             inc: 0
-        }
+        },
+        budget: 0,
+        percentage: -1
+    };
+    var calculateTotal = (type) => {
+        console.table(data.allItems[type]);
+        var sum = 0;
+        data.allItems[type].forEach((current) => {
+            sum += current.value;
+        });
+        console.log(sum);
+        data.total[type] = sum;
     };
 
     return {
@@ -35,8 +46,26 @@ var budgetController = (() => {
                 item = new Expense(id, description, value);
             }
 
-            data.allItems[type].push(type);
+            data.allItems[type].push(item);
             return item;
+        },
+
+        calculateBudget: () => {
+            calculateTotal('exp');
+            calculateTotal('inc');
+            data.budget = data.total.inc - data.total.exp;
+
+            if(data.total.inc > 0) {
+                data.percentage = Math.round((data.total.exp / data.total.inc) * 100);
+            }
+            console.table(data)
+        },
+
+        getBudget: () => {
+            return {
+                budget: data.budget,
+                percentage: data.percentage
+            }
         }
     };
 })();
@@ -113,16 +142,20 @@ var controller = ((budgetCtrl, uiCtrl) => {
     });
     };
 
+    var updateBudget = () => {
+        budgetCtrl.calculateBudget();
+    };
+
     var addItem = () => {
         var inputs, newItem;
 
         inputs = uiCtrl.getInput();
 
-        console.table(inputs);
         if(inputs.description != '' && !isNaN(inputs.value) && inputs.value > 0) {
             newItem = budgetController.addItem(inputs.type, inputs.description, inputs.value);
             uiCtrl.addList(inputs.type, newItem);
             uiCtrl.clearFields();
+            updateBudget();
         }
     };
 
