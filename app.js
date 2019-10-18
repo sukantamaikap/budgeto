@@ -54,6 +54,20 @@ var budgetController = (() => {
             return item;
         },
 
+        deleteItem: (type, id) => {
+            var ids, index;
+            ids = data.allItems[type].map( (current) => {
+                return current.id;
+            });
+
+            index = ids.indexOf(id);
+
+            if (index !== -1) {
+                data.allItems[type].splice(index, 1);
+            }
+
+        },
+
         calculateBudget: () => {
             calculateTotal('exp');
             calculateTotal('inc');
@@ -81,7 +95,8 @@ var uiController = (() => {
         budgetValue: '.budget__value',
         budgetIncome: '.budget__income--value',
         budgetExpene: '.budget__expenses--value',
-        budgetExpensePercentage: '.budget__expenses--percentage'
+        budgetExpensePercentage: '.budget__expenses--percentage',
+        container: '.container'
     };
 
 
@@ -100,11 +115,11 @@ var uiController = (() => {
             if(type === 'inc') {
                 element = DOMStrings.incomeList;
 
-                htmlChunk = '<div class="item clearfix" id="%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                htmlChunk = '<div class="item clearfix" id="inc-----%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
 
             } else {
                 element = DOMStrings.expenseList;
-                htmlChunk = '<div class="item clearfix" id="%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                htmlChunk = '<div class="item clearfix" id="exp-----%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
 
             // replace placeholders with with value from obj
@@ -125,7 +140,6 @@ var uiController = (() => {
         },
 
         displayBudget: (obj) => {
-            console.table(obj);
             document.querySelector(DOMStrings.budgetValue).textContent = obj.budget;
             document.querySelector(DOMStrings.budgetIncome).textContent = obj.income;
             document.querySelector(DOMStrings.budgetExpene).textContent = obj.expense;
@@ -139,6 +153,12 @@ var uiController = (() => {
 
         getDOMStrings: () => {
             return DOMStrings;
+        },
+
+        delteListItem: (id) => {
+            // to delete from dom, move to parent, and then delete the child
+            var element = document.getElementById(id);
+            element.parentNode.removeChild(element);
         }
     };
 
@@ -151,16 +171,22 @@ var controller = ((budgetCtrl, uiCtrl) => {
 
         document.querySelector(domStrings.inputBtn).addEventListener('click', addItem);
 
-    // action based on enter key press
-    document.addEventListener('keypress', function(event) {
-        if (event.keyCode === 13 || event.which === 13) {
-            addItem();
-        }
-    });
+        // action based on enter key press
+        document.addEventListener('keypress', function(event) {
+            if (event.keyCode === 13 || event.which === 13) {
+                addItem();
+            }
+        });
+
+        document.querySelector(domStrings.container).addEventListener('click', deleteItem);
     };
 
     var updateBudget = () => {
+        var summary;
         budgetCtrl.calculateBudget();
+
+        summary = budgetCtrl.getBudget();
+        uiCtrl.displayBudget(summary);
     };
 
     var addItem = () => {
@@ -174,8 +200,22 @@ var controller = ((budgetCtrl, uiCtrl) => {
             uiCtrl.addList(inputs.type, newItem);
             uiCtrl.clearFields();
             updateBudget();
-            summary = budgetCtrl.getBudget();
-            uiCtrl.displayBudget(summary);
+            
+        }
+    };
+
+    var deleteItem = (event) => {
+        var itemId, type, id;
+        itemId = event.target.parentNode.parentNode.parentNode.parentNode.id;
+
+        if (itemId) {
+            type = itemId.split('-----')[0];
+            id = itemId.split('-----')[1];
+            budgetCtrl.deleteItem(type, id);
+            uiCtrl.delteListItem(itemId);
+            updateBudget();
+            // summary = budgetCtrl.getBudget();
+            // uiCtrl.displayBudget(summary);
         }
     };
 
