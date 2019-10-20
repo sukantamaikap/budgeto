@@ -1,5 +1,6 @@
 var budgetController = (() => {
 
+    // function constructor
     var Income = function(id, description, value) {
         this.id = id;
         this.description = description;
@@ -10,6 +11,16 @@ var budgetController = (() => {
         this.id = id;
         this.description = description;
         this.value = value;
+        this.expensePercent = -1;
+    };
+
+    Expense.prototype.calculatePercentage = function(totalIncome) {
+        console.log('insdie .. you hu!!!!!')
+        if (totalIncome > 0) {
+            this.expensePercent = Math.round(((this.value / totalIncome) * 100));
+        }
+        console.log('expense percentage : ' +  this.expensePercent);
+        return this.expensePercent;
     };
 
     var data = {
@@ -71,6 +82,13 @@ var budgetController = (() => {
         calculateBudget: () => {
             calculateTotal('exp');
             calculateTotal('inc');
+        },
+
+        calcParcentage: function() {
+            var prcnteges = data.allItems.exp.map((curr) => {
+                return curr.calculatePercentage(data.total.inc);
+            });
+            return prcnteges;
         },
 
         getBudget: () => {
@@ -189,6 +207,10 @@ var controller = ((budgetCtrl, uiCtrl) => {
         uiCtrl.displayBudget(summary);
     };
 
+    var updatePercentage =  () => {
+        var prcnt = budgetCtrl.calcParcentage();
+    };
+
     var addItem = () => {
         var inputs, newItem;
 
@@ -200,7 +222,7 @@ var controller = ((budgetCtrl, uiCtrl) => {
             uiCtrl.addList(inputs.type, newItem);
             uiCtrl.clearFields();
             updateBudget();
-            
+            updatePercentage();
         }
     };
 
@@ -214,8 +236,7 @@ var controller = ((budgetCtrl, uiCtrl) => {
             budgetCtrl.deleteItem(type, id);
             uiCtrl.delteListItem(itemId);
             updateBudget();
-            // summary = budgetCtrl.getBudget();
-            // uiCtrl.displayBudget(summary);
+            updatePercentage();
         }
     };
 
