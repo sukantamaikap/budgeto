@@ -15,11 +15,9 @@ var budgetController = (() => {
     };
 
     Expense.prototype.calculatePercentage = function(totalIncome) {
-        console.log('insdie .. you hu!!!!!')
         if (totalIncome > 0) {
             this.expensePercent = Math.round(((this.value / totalIncome) * 100));
         }
-        console.log('expense percentage : ' +  this.expensePercent);
         return this.expensePercent;
     };
 
@@ -114,7 +112,8 @@ var uiController = (() => {
         budgetIncome: '.budget__income--value',
         budgetExpene: '.budget__expenses--value',
         budgetExpensePercentage: '.budget__expenses--percentage',
-        container: '.container'
+        container: '.container',
+        expensePercentageLabel: '.item__percentage'
     };
 
 
@@ -169,6 +168,26 @@ var uiController = (() => {
 
         },
 
+        displayPercentages: function(percentages) {
+            var fieldsList = document.querySelectorAll(DOMStrings.expensePercentageLabel);
+
+            console.log(fieldsList);
+
+            var nodeListForEach = function(list, callback) {
+                console.log('inside node 1');
+                for (var i = 0; i < list.length; i++) {
+                    callback(list[i], i);
+                }
+            };
+
+            nodeListForEach(fieldsList, function(current, index) {
+                console.log('inline', percentages, current);
+                if (percentages[index] > 0) {
+                    current.textContent = percentages[index] + '%';
+                }
+            });
+        },
+
         getDOMStrings: () => {
             return DOMStrings;
         },
@@ -208,7 +227,8 @@ var controller = ((budgetCtrl, uiCtrl) => {
     };
 
     var updatePercentage =  () => {
-        var prcnt = budgetCtrl.calcParcentage();
+        var percentage = budgetCtrl.calcParcentage();
+        uiCtrl.displayPercentages(percentage);
     };
 
     var addItem = () => {
