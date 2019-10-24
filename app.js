@@ -116,6 +116,21 @@ var uiController = (() => {
         expensePercentageLabel: '.item__percentage'
     };
 
+    var formatNumber = (num, type) => {
+        var numSplit, sign;
+
+        num = Math.abs(num);
+        num = num.toFixed(2);
+        
+        numSplit = num.split('.');
+        int = numSplit[0];
+        if (int.length > 3) {
+            int = int.substr(0 , (int.length -3)) + ',' + int.substr((int.length -3), int.length);
+        }
+        type === 'exp' ? sign = '-' : sign = '+';
+        return sign + ' ' + int + '.' + numSplit[1];
+    };
+
 
     return {
         getInput: () => {
@@ -140,7 +155,7 @@ var uiController = (() => {
             }
 
             // replace placeholders with with value from obj
-            htmlChunk = htmlChunk.replace('%id%', obj.id).replace('%description%', obj.description).replace('%value%', obj.value);
+            htmlChunk = htmlChunk.replace('%id%', obj.id).replace('%description%', obj.description).replace('%value%', formatNumber(obj.value, type));
 
             document.querySelector(element).insertAdjacentHTML('beforeend', htmlChunk);
 
@@ -157,9 +172,11 @@ var uiController = (() => {
         },
 
         displayBudget: (obj) => {
-            document.querySelector(DOMStrings.budgetValue).textContent = obj.budget;
-            document.querySelector(DOMStrings.budgetIncome).textContent = obj.income;
-            document.querySelector(DOMStrings.budgetExpene).textContent = obj.expense;
+            var type;
+            obj.budget > 0 ? type = 'inc' : type = 'exp';
+            document.querySelector(DOMStrings.budgetValue).textContent = formatNumber(obj.budget, type);
+            document.querySelector(DOMStrings.budgetIncome).textContent = formatNumber(obj.income, 'inc');
+            document.querySelector(DOMStrings.budgetExpene).textContent = formatNumber(obj.expense, 'exp');
             if(obj.percentage > 0) {
                 document.querySelector(DOMStrings.budgetExpensePercentage).textContent = obj.percentage + '%';
             } else {
